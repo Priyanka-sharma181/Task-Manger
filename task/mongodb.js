@@ -1,6 +1,11 @@
-const MongoClient = require("mongodb").MongoClient
+
+const {MongoClient,ObjectID} = require("mongodb")
 const conectionUrl = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.4"
 const databaseName  = "task-manger"
+const id = new ObjectID()
+console.log(id.id.length);
+console.log(id.getTimestamp());
+
 MongoClient.connect(conectionUrl,(error,client)=>{
     if(error){
         console.log(error);
@@ -22,12 +27,16 @@ MongoClient.connect(conectionUrl,(error,client)=>{
         //     }
         // })
         // added task 
-        db.collection('task').insertMany([{description:true,completed:"clean the house"},{description:false,completed:"pot plants"}],(error,res)=>{
-            if(error){
-                console.log("unable to insert");
-            }
+        // db.collection('task').insertMany([{description:true,completed:"clean the house"},{description:false,completed:"pot plants"}],(error,res)=>{
+        //     if(error){
+        //         console.log("unable to insert");
+        //     }
+        //     console.log(res);
+        // })
+        db.collection('task').find({description:true}).toArray((error,res)=>{
             console.log(res);
         })
+        
     }
     
 })
