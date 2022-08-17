@@ -38,7 +38,7 @@ const UserSchema = new mongoose.Schema({
         }
     }
 })
- 
+//  hash the paln text password
 UserSchema.pre('save', async function(next){
     user = this
     if(user.isModified('password')){
@@ -46,5 +46,23 @@ UserSchema.pre('save', async function(next){
     }
     next()
 })
+
+// Log in 
+
+UserSchema.statics.findByCredentials = async (email,password)=>{
+    console.log(email,password);
+    const user = await User.findOne({email})
+    console.log(user);
+    if(!user){
+        throw new Error("unable to log in")
+    }
+    const isMatch = await bcrypt.compare(password, user.password)
+    console.log(isMatch);
+    if(!isMatch){
+        throw new Error("unable to log in")       
+    }
+    return user
+}
+
 const User = mongoose.model("User",UserSchema)
 module.exports = User

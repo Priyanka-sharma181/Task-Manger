@@ -12,6 +12,18 @@ router.post("/user",async (req,res)=>{
      res.status(400).send(error)
  }
 })
+
+router.post("/user/login", async(req,res)=>{
+    try {
+    const user = await  User.findByCredentials(req.body.email,req.body.password)
+    console.log(user);
+    res.send(user)
+
+    } catch (e) {
+        console.log(e);
+        res.send(e)
+    }
+})
 router.get("/users",async(req,res)=>{
  try {
    users =  await User.find({})
@@ -47,8 +59,9 @@ router.patch("/userUpdate/:id",async(req,res)=>{
      res.status(404).send()
    }
    res.send(user)
- } catch (error) {
-     res.status(400).send(error)
+ } catch (e) {
+    console.log(e);
+     res.status(400).send(e)
  }
 })
 
