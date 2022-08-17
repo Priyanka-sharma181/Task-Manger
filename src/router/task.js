@@ -59,4 +59,15 @@ router.patch("/updateTask/:id",async (req,res)=>{
 
 })
 
+router.delete("/deleteUSer/:id",async (req,res)=>{
+    try {
+      const task =await  Task.findByIdAndDelete(req.params.id)
+      if(!task){
+         res.send(400).send()
+      }
+      res.send(task)
+    } catch (error) {
+     res.status(500).send(error)
+    }
+ })
 module.exports = router
