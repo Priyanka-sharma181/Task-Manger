@@ -81,8 +81,26 @@ UserSchema.methods.generateAuthToken = async function () {
 
     return token
 }
+//  for stringfy 
+UserSchema.methods.toJSON = function(){
+    user = this
+    userObject = user.toObject()
+    delete userObject.password
+    delete userObject.tokens
+    return userObject
+}
 
+UserSchema.virtual('tasks', {
+    ref: 'Task',
+    localField: '_id',
+    foreignField: 'owner'
+})
 
+UserSchema.pre('remove', async function (next) {
+    const user = this
+    await Task.deleteMany({ owner: user._id })
+    next()
+})
 
 const User = mongoose.model("User",UserSchema)
 module.exports = User

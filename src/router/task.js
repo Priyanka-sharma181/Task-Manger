@@ -1,10 +1,11 @@
 const express = require("express")
 const router = express.Router()
-const Task = require("../model/task")
+const Task = require("../model/task")   
+const auth = require("../middle/auth")
 
 
 
-router.post("/Task",async(req,res)=>{
+router.post("/task",auth,async(req,res)=>{
     const task = new Task(req.body)
     try {
         await task.save()
@@ -15,22 +16,24 @@ router.post("/Task",async(req,res)=>{
     }
 })
 
-router.get("/Tasks",async(req,res)=>{
+router.get("/Tasks",auth,async(req,res)=>{
     try {
-      const task =  await Task.find({})
-      res.status(200).send(task)
+  await   req.user.populate('tasks').execPopulate()
+  console.log(req.user.tasks);
+      res.send(req.user.tasks)
     } catch (error) {
+        console.log(error);
         res.status(200).send(error)
     }
     
 
 })
 
-router.get("/Tasks/:id",async(req,res)=>{
+router.get("/Tasks/:id",auth,async(req,res)=>{
     const _id = req.params.id
     try {
-      TaskFindById =  await Task.findById(_id)
-        res.status(200).send(TaskFindById)
+      taskFindById =  await Task.findOne({_id,owener:req.user._id})
+        res.status(200).send(taskFindById)
 
     } catch (error) {
         res.status(400).send(error)
@@ -48,20 +51,24 @@ router.patch("/updateTask/:id",async (req,res)=>{
         return res.status(400).send({ error: 'Invalid updates!' })
     }
     try {
-        const  user = await Task.findByIdAndUpdate(id,req.body,{new:true,runValidators:true})
-        if(!user){
-          res.status(404).send()
+        const task = await Task.findOne({ _id: req.params.id, owner: req.user._id})
+
+        if (!task) {
+            return res.status(404).send()
         }
-        res.send(user)
+
+        updates.forEach((update) => task[update] = req.body[update])
+        await task.save()
+        res.send(task)
       } catch (error) {
           res.status(400).send(error)
       }
 
 })
 
-router.delete("/deleteUSer/:id",async (req,res)=>{
+router.delete("/task/:id",async (req,res)=>{
     try {
-      const task =await  Task.findByIdAndDelete(req.params.id)
+      const task =await  Task.findOneAndDelete({_id:req.params.id,owner:req.user.id})
       if(!task){
          res.send(400).send()
       }
