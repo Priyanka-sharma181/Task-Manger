@@ -17,16 +17,15 @@ router.post("/task",auth,async(req,res)=>{
 })
 
 router.get("/Tasks",auth,async(req,res)=>{
-    try {
-  await   req.user.populate('tasks').execPopulate()
-  console.log(req.user.tasks);
-      res.send(req.user.tasks)
+    try{
+    await req.user.populate("tasks").exec((err, user) => {
+
+        res.send(req.user)
+    })
     } catch (error) {
         console.log(error);
         res.status(200).send(error)
     }
-    
-
 })
 
 router.get("/Tasks/:id",auth,async(req,res)=>{
@@ -78,3 +77,6 @@ router.delete("/task/:id",async (req,res)=>{
     }
  })
 module.exports = router
+
+
+

@@ -43,7 +43,13 @@ const UserSchema = new mongoose.Schema({
             type: String,
             required: true
         }
-    }]
+    }],
+    avatar:{
+        type:Buffer
+    
+    },
+}, {
+    timestamps: true    
 })
 
 //  hash the paln text password
@@ -74,7 +80,7 @@ UserSchema.statics.findByCredentials = async (email,password)=>{
 // authentication 
 UserSchema.methods.generateAuthToken = async function () {
     const user = this
-    const token = jwt.sign({ _id: user._id }, "priyankasharma")
+    const token = jwt.sign({ _id: user._id }, "priyankasharma",{expiresIn:"6h"})
 //    console.log(token);
     user.tokens = user.tokens.concat({ token })
     await user.save()
@@ -104,3 +110,7 @@ UserSchema.pre('remove', async function (next) {
 
 const User = mongoose.model("User",UserSchema)
 module.exports = User
+
+
+
+
